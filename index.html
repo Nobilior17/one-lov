@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Love</title>
+    <style>
+        body {
+            margin: 0;
+            background-color: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            /* Перспектива создает эффект 3D-глубины */
+            perspective: 1000px;
+        }
+
+        .container {
+            position: relative;
+            /* Сохраняет 3D-пространство для дочерних элементов */
+            transform-style: preserve-3d;
+            /* Вращение всего контейнера по кругу */
+            animation: rotateHeart 15s infinite linear;
+        }
+
+        .word {
+            color: #ff69b4; /* Розовый цвет как на фото */
+            font-size: 1.2rem;
+            font-family: Arial, sans-serif;
+            position: absolute;
+            white-space: nowrap;
+            /* Неоновое свечение */
+            text-shadow: 0 0 5px #ff1493, 0 0 10px #ff1493;
+            /* Центрируем слова относительно их координат */
+            transform-origin: center center;
+            transform: translate(-50%, -50%) translate3d(var(--x), var(--y), var(--z));
+            opacity: 0;
+            /* Анимация появления */
+            animation: fadeIn 1s forwards;
+        }
+
+        /* Стиль для центральной надписи */
+        .center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 1.8rem;
+            font-weight: bold;
+            font-family: Arial, sans-serif;
+            white-space: nowrap;
+            text-shadow: 0 0 10px #ff1493, 0 0 20px #ff1493, 0 0 30px #ff1493;
+            z-index: 10; /* Чтобы текст был поверх слов */
+            pointer-events: none;
+            text-align: center;
+        }
+
+        /* Анимация вращения контейнера */
+        @keyframes rotateHeart {
+            from {
+                transform: rotateY(0deg);
+            }
+            to {
+                transform: rotateY(360deg);
+            }
+        }
+
+        /* Анимация плавного появления слов */
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="heart-container">
+    <!-- Центральная надпись, которая не вращается -->
+    <div class="center-text">Я тебя люблю, Котя</div>
+</div>
+
+<script>
+    const container = document.getElementById('heart-container');
+    const textStr = "I love you"; // Текст, который будет летать вокруг
+    const totalWords = 200; // Количество слов
+
+    // Функция расчета координат сердца (параметрическое уравнение)
+    function getHeartPoint(t) {
+        const x = 16 * Math.pow(Math.sin(t), 3);
+        const y = 13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t);
+        // Масштабируем и инвертируем Y (в браузере ось Y идет вниз)
+        return { 
+            x: x * 12, 
+            y: -y * 12 
+        };
+    }
+
+    // Создаем слова и расставляем их
+    for (let i = 0; i < totalWords; i++) {
+        const wordEl = document.createElement('div');
+        wordEl.className = 'word';
+        wordEl.textContent = textStr;
+        
+        // Распределяем точки по кругу (от 0 до 2 Пи)
+        const t = (i / totalWords) * Math.PI * 2;
+        const point = getHeartPoint(t);
+        
+        // Добавляем случайную глубину (Z) для создания объема
+        const z = (Math.random() - 0.5) * 100; 
+        
+        // Задаем координаты через CSS-переменные
+        wordEl.style.setProperty('--x', `${point.x}px`);
+        wordEl.style.setProperty('--y', `${point.y}px`);
+        wordEl.style.setProperty('--z', `${z}px`);
+        
+        // Небольшая задержка для плавного появления (эффект "оживания")
+        wordEl.style.animationDelay = `${i * 0.01}s`;
+
+        container.appendChild(wordEl);
+    }
+</script>
+
+</body>
+</html>
